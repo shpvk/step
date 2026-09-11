@@ -1,19 +1,20 @@
 {
-  "name": "node_ts_lessons",
+  "name": "homework-fs",
   "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-stream-iter src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=25.9.0"
+  },
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "start": "npx tsx ./src/index.ts",
-    "build": "tsc"
-  },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
   "devDependencies": {
-    "@types/node": "^26.4.1",
-    "tsx": "^4.23.13",
+    "@types/node": "^26.5.1",
     "typescript": "^7.0.2"
   }
 }
