@@ -116,6 +116,16 @@ nav a:hover {
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
+.book img {
+    display: block;
+    width: 100%;
+    height: 260px;
+    object-fit: contain;
+    background: #f5f3ef;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
 .book h3 {
     color: #3d405b;
     margin-bottom: 8px;

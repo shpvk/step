@@ -1,95 +1,120 @@
-import http from "node:http"
-import fs from "node:fs"
+import express from "express"
 import path from "node:path"
-import { URL } from "node:url"
-import 'dotenv/config'
-import { books } from "./data/books.js"
-import { showAllBooks, showBook } from "./utils/showBooks.js"
+import "dotenv/config"
 import { BookType } from "./types/BookType.js"
+import { BookResponseType } from "./types/BookResponseType.js"
 
-/*
-https://shop.com/product/?name=phone&price=1000&key=value&key2=value2  - query params
-https://shop.com/category/phones/32  - params
-http://localhost:4200/books
-params
-query params
-body
-GET POST PUT PATCH DELETE
-CRUD - Create Read Update Delete
-REST API 
-*/
-const server = http.createServer((req,res)=>{
-    const url = new URL(req.url ?? "/", `http://${req.headers.host}`)
-    const PATH_TO_PAGES = path.join("src","pages") 
-    if(req.method==="GET" &&  req.url==='/books')
-    {
-        const books_content:string = showAllBooks(books)
-        res.setHeader("Content-Type", "text/html; charset=utf-8")
-        res.write(books_content)
-        res.end()
-    }
-    else if(req.method === "GET" && url.pathname==='/book/' && url.searchParams)
-    {
-        if(url.searchParams.get("id")!==undefined)
-        {
-            const id:number = Number(url.searchParams.get("id"))
-            const book : BookType|undefined= books.filter(book=>book.id===id)[0]
-            console.log(book)
-            if(book!==undefined)
-            {
-                res.setHeader("Content-Type", "text/html; charset=utf-8")
-                res.write(showBook(book))    
-            }
-        }
-        
-        res.end()
-    }
+const cl = console.log
+const PORT = process.env.PORT || 3200
+const HOST = process.env.HOST || "http://localhost"
 
-    else if(req.method==="POST" && req.url==="books")
-    {
-        res.write("Hello")
-    }
+const app = express()
 
+const book:BookType = {
+    id:1,
+    title:"new book",
+    price:2000,
+    is_active:true
+}
 
+const books:BookType[] = [
+    {
+        id:1,
+        title:"new book",
+        price:2000,
+        is_active:true
+    },
+    {
+        id:2,
+        title:"second book",
+        price:1500,
+        is_active:false
+    }
+]
 
-    if(req.method==="GET" && path.extname(req.url as string)==='.css')
-    {
-        const PATH_TO_CSS = path.join("src","styles",req.url as string)
-        const content = fs.readFileSync(PATH_TO_CSS)
-        res.setHeader("Content-Type", "text/css; charset=utf-8")
-        
-        res.write(content)
-    }
-    if(req.method==="GET" && req.url==='/')
-    {
-        const PATH_TO_INDEX_PAGE = path.join(PATH_TO_PAGES,"index.html")
-        const content = fs.readFileSync(PATH_TO_INDEX_PAGE)
-        res.setHeader("Content-Type", "text/html; charset=utf-8")
-        
-        res.write(content)
-    }
-    else if(req.method==="GET" && req.url==='/about')
-    {
-        const PATH_TO_ABOUT_PAGE = path.join(PATH_TO_PAGES,"about.html")
-        const content = fs.readFileSync(PATH_TO_ABOUT_PAGE)
-        res.setHeader("Content-Type", "text/html; charset=utf-8")
-
-        res.write(content)
-    }
-    // else if(req.method === "POST"){
-    //     res.setHeader("Content-Type", "application/json; charset=utf-8")
-    //     const user = {
-    //         name:"Alex",
-    //         age:20
-    //     }
-    //     res.write(JSON.stringify(user))
-    // }
-     else if(req.method === "PUT"){
-        res.write(`Ти хочеш оновити дані. Request: ${req.method}`)
-    }
-    
-    res.end()
+app.get('/',(req,res)=>{
+    res.writeHead(200,{
+        "Content-Type":"text/html"
+    })
+    res.end("<h2>Hello from express</h2>")
 })
-server.listen(process.env.PORT,()=>{
-    console.log(`Server ${process.env.HOST}:${process.env.PORT} has been started...`)
+
+app.get('/book',(req,res)=>{
+    res.writeHead(200,{
+        "Content-Type":"application/json"
+    })
+    res.end(JSON.stringify(book))
+})
+
+app.get('/books',(req,res)=>{
+    res.writeHead(200,{
+        "Content-Type":"application/json"
+    })
+    res.end(JSON.stringify(books))
+})
+
+app.get('/books/:id',(req,res)=>{
+    const id:number = +req.params.id
+    const book:BookType|undefined = books.find((book)=>book.id===id);
+    const exist_book:boolean = (book!==undefined)
+    const response:BookResponseType = {
+        data:exist_book?book as BookType:null,
+        error:exist_book?null:"The book not found",
+        status:exist_book?200:404
+    };
+
+    res.writeHead(response.status,{
+        "Content-Type":"application/json"
+    })
+    res.end(JSON.stringify(response))
+})
+
+app.post('/book', (req, res)=>{
+    let book:BookType = {
+        id:3,
+        title:"testdelete",
+        price:0,
+        is_active:true
+    }
+
+    books.push(book);
+
+    res.writeHead(201,{
+        "Content-Type":"application/json"
+    })
+    res.end(JSON.stringify(book))
+})
+
+app.delete('/books/:id',(req,res)=>{
+    const id:number = +req.params.id
+    const book:BookType | undefined = books.find((book)=>book.id===id);
+    const index:number = books.indexOf(book as BookType)
+    const exist_book:boolean = (book!==undefined)
+    const response:BookResponseType = {
+        data:exist_book?books[index]:null,
+        error:exist_book?null:"The book not found",
+        status:exist_book?200:404
+    };
+    if(exist_book)
+    {
+        delete(books[index]);
+        for(let i=index;i<books.length-1;i++)
+        {
+            books[i] = books[i+1]
+        }
+        books.length--
+    }
+
+    res.writeHead(response.status,{
+        "Content-Type":"application/json"
+    })
+    res.end(JSON.stringify(response))
+})
+
+app.use('/images', express.static(path.join("images")))
+app.use(express.static(path.join("src","styles")))
+app.use(express.static(path.join("src","pages")))
+
+app.listen(PORT, ()=>{
+    cl(`Server has been started ${HOST}:${PORT}`)
 })
