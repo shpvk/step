@@ -32,6 +32,23 @@ const books:BookType[] = [
     }
 ]
 
+app.get('/book/:title/:is_active', (req, res) => {
+    const title:string = req.params.title.toLowerCase()
+    const is_active:boolean = (req.params.is_active === "true")
+    const book:BookType|undefined = books.find((book)=>book.title.toLowerCase().includes(title) && book.is_active===is_active);
+    const exist_book:boolean = (book!==undefined)
+    const response:BookResponseType = {
+        data:exist_book?book as BookType:null,
+        error:exist_book?null:"The book not found",
+        status:exist_book?200:404
+    };
+
+    res.writeHead(response.status,{
+        "Content-Type":"application/json"
+    })
+    res.end(JSON.stringify(response))
+})
+
 app.get('/',(req,res)=>{
     res.writeHead(200,{
         "Content-Type":"text/html"
