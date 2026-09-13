@@ -87,19 +87,25 @@ app.get('/books/:id',(req,res)=>{
 })
 
 app.post('/book', (req, res)=>{
-    let book:BookType = {
-        id:3,
-        title:"testdelete",
-        price:0,
+    const book:BookType = {
+        id:books.length+1,
+        title:"new test book",
+        price:123123,
         is_active:true
     }
 
     books.push(book);
 
-    res.writeHead(201,{
+    const response:BookResponseType = {
+        data:book,
+        error:null,
+        status:201
+    };
+
+    res.writeHead(response.status,{
         "Content-Type":"application/json"
     })
-    res.end(JSON.stringify(book))
+    res.end(JSON.stringify(response))
 })
 
 app.delete('/books/:id',(req,res)=>{

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Додати книгу — Міська бібліотека</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="add-book.css">
+</head>
+<body>
+
+    <header>
+        <div class="container header-content">
+            <h1>Міська бібліотека</h1>
+
+            <nav>
+                <a href="/">Головна</a>
+                <a href="books">Книги</a>
+                <a href="about.html">Про нас</a>
+                <a href="add-book.html">Додати книгу</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <section class="hero">
+            <div class="container">
+                <h2>Додати книгу</h2>
+                <p>Натисніть кнопку — нова книга буде додана до масиву books на сервері.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+
+                <form id="book-form" class="book-form">
+                    <button type="submit" class="button">Додати книгу</button>
+                </form>
+
+                <p id="message" class="message" hidden></p>
+
+                <pre id="result" class="result" hidden></pre>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 Міська бібліотека. Усі права захищені.</p>
+        </div>
+    </footer>
+
+    <script>
+        const form = document.getElementById("book-form")
+        const message = document.getElementById("message")
+        const result = document.getElementById("result")
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault()
+
+            const response = await fetch("/book", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+
+            const data = await response.json()
+
+            message.hidden = false
+            message.textContent = response.ok
+                ? "Книгу додано до масиву books"
+                : "Не вдалося додати книгу"
+
+            result.hidden = false
+            result.textContent = JSON.stringify(data, null, 4)
+        })
+    </script>
+
+</body>
+</html>
