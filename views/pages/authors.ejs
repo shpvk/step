@@ -1,0 +1,15 @@
+<div class="page-head">
+  <h1>Authors</h1>
+</div>
+
+<% if (authors.length === 0) { %>
+  <p class="empty">Авторів не знайдено</p>
+<% } else { %>
+  <ul class="authors">
+    <% authors.forEach(author => { %>
+      <li class="author-card">
+        <a href="/authors/<%= author.id %>"><%= author.name %></a>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>

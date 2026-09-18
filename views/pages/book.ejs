@@ -1,0 +1,31 @@
+<a class="back-link" href="/books">← До списку</a>
+
+<article class="book-page">
+  <img class="book-page-cover" src="/images/<%= book.image %>" alt="<%= book.title %>" />
+
+  <div class="book-page-body">
+    <h1 class="book-page-title"><%= book.title %></h1>
+    <% if (authors.length > 0) { %>
+      <p class="book-authors">
+        <% authors.forEach((author, index) => { %>
+          <a href="/authors/<%= author.id %>"><%= author.name %></a><%= index < authors.length - 1 ? ", " : "" %>
+        <% }) %>
+      </p>
+    <% } %>
+    <p class="book-price"><%= book.price %> грн</p>
+    <span class="book-status <%= book.is_active ? 'in-stock' : 'out-of-stock' %>">
+      <%= book.is_active ? 'В наявності' : 'Немає' %>
+    </span>
+
+    <dl class="book-meta">
+      <dt>Код товару</dt>
+      <dd>#<%= book.id %></dd>
+      <% if (book.create_time) { %>
+        <dt>Додано</dt>
+        <dd><%= new Date(book.create_time).toLocaleDateString("uk-UA") %></dd>
+      <% } %>
+    </dl>
+
+    <a class="book-button<%= book.is_active ? '' : ' disabled' %>" href="/books"><%= book.is_active ? 'Купити' : 'Немає в наявності' %></a>
+  </div>
+</article>

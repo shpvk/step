@@ -20,3 +20,8 @@ Content-Type: application/json
     "price": 1000,
     "is_active": true
 }
+###
+GET http://localhost:4200/authors
+
+###
+GET http://localhost:4200/authors/1

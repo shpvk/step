@@ -1,0 +1,21 @@
+<% if (books.length === 0) { %>
+  <p class="empty">Книжок не знайдено</p>
+<% } else { %>
+  <ul class="books">
+    <% books.forEach(book => { %>
+      <li class="book-card">
+        <a href="/books/<%= book.id %>">
+          <img class="book-cover" src="/images/<%= book.image %>" alt="<%= book.title %>" />
+        </a>
+        <div class="book-body">
+          <h2 class="book-title"><%= book.title %></h2>
+          <p class="book-price"><%= book.price %> грн</p>
+          <span class="book-status <%= book.is_active ? 'in-stock' : 'out-of-stock' %>">
+            <%= book.is_active ? 'В наявності' : 'Немає' %>
+          </span>
+          <a class="book-button" href="/books/<%= book.id %>">Детальніше</a>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>

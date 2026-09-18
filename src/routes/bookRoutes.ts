@@ -1,50 +1,43 @@
 import { Router, Request, Response } from "express";
 import { books } from "../data/books.js";
 import { BookCreateType, BookType } from "../types/BookType.js";
+import { AuthorType } from "../types/AuthorType.js";
 import { compareBook, getBooksByTitle } from "../utils/showBooks.js";
 import { BookResponseType } from "../types/BookResponseType.js";
- 
+import { pool } from "../db/db_connection.js"
 const bookRouter = Router();
  
-//отримання всіх книжок, або пошук по ?title=book_name
-bookRouter.get(
-  "/",
-  (
-    req: Request<{}, BookResponseType, null, { title: string }>,
-    res: Response,
-  ) => {
-    const exist_book: boolean = books.length > 0;
-    const title = String(req.query.title);
-    let our_books: BookType[] | null = null;
-    if (title !== undefined) {
-      our_books = getBooksByTitle(title, books);
-    }
-    res.render("pages/books",{books})
-    // const response: BookResponseType = {
-    //   data: exist_book ? (our_books !== null ? our_books : books) : null,
-    //   error: exist_book ? null : "Books list is empty",
-    //   status: exist_book ? 200 : 404,
-    // };
-    // res.writeHead(response.status, {
-    //   "Content-Type": "application/json",
-    // });
-    // res.end(JSON.stringify(response));
-  },
-);
- 
-//отримання книжки за id
-bookRouter.get("/:id", (req: Request<{ id: number }>, res) => {
-  const id = +req.params.id;
-  const book: BookType | undefined = books.find((book) => book.id === id);
-  const exist_book: boolean = book !== undefined;
-  const response: BookResponseType = {
-    data: exist_book ? (book as BookType) : null,
-    error: exist_book ? null : "The book not found",
-    status: exist_book ? 200 : 404,
-  };
-  res.status(response.status).json(response);
+//отримання всіх книжок
+bookRouter.get("/", async (req: Request, res: Response) => {
+  const data = await pool.query<BookType>("SELECT * FROM books ORDER BY id");
+  res.render("pages/books", { books: data.rows, title: "Books" });
 });
- 
+
+//отримання книжки за id
+bookRouter.get("/:id", async (req: Request<{ id: string }>, res: Response) => {
+  const id = +req.params.id;
+  const data = await pool.query<BookType>("SELECT * FROM books WHERE id=$1", [id]);
+  const book = data.rows[0];
+
+  if (book === undefined) {
+    res.status(404).render("pages/error", {
+      title: "Error",
+      message: "The book not found",
+    });
+    return;
+  }
+
+  const authorsData = await pool.query<AuthorType>(
+    `SELECT a.* FROM authors a
+     JOIN book_authors ba ON ba.author_id = a.id
+     WHERE ba.book_id = $1
+     ORDER BY a.id`,
+    [id],
+  );
+
+  res.render("pages/book", { book, authors: authorsData.rows, title: book.title });
+});
+
 //створення книжки
 bookRouter.post("/", (req: Request<{}, BookResponseType, BookCreateType>, res) => {
   const body = req.body;
