@@ -7,8 +7,16 @@ import { BookResponseType } from "../types/BookResponseType.js";
 import { pool } from "../db/db_connection.js"
 const bookRouter = Router();
  
-//отримання всіх книжок
-bookRouter.get("/", async (req: Request, res: Response) => {
+//отримання всіх книжок та книжок за полем title
+bookRouter.get("/", async (req: Request<{}, {}, {}, { title?: string }>, res: Response) => {
+  const title = req.query.title;
+
+  if (title !== undefined) {
+    const found = await pool.query<BookType>("SELECT * FROM books WHERE title ILIKE $1 ORDER BY id", [`%${title}%`]);
+    res.render("pages/books", { books: found.rows, title: "Books" });
+    return;
+  }
+
   const data = await pool.query<BookType>("SELECT * FROM books ORDER BY id");
   res.render("pages/books", { books: data.rows, title: "Books" });
 });
