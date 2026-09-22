@@ -25,3 +25,16 @@ GET http://localhost:4200/authors
 
 ###
 GET http://localhost:4200/authors/1
+
+###
+PUT http://localhost:4200/books/1
+Content-Type: application/json
+
+{
+    "title": "Кобзар",
+    "price": 399.99,
+    "is_active": true
+}
+
+###
+DELETE http://localhost:4200/books/1

@@ -3,7 +3,7 @@
 <% } else { %>
   <ul class="books">
     <% books.forEach(book => { %>
-      <li class="book-card">
+      <li class="book-card" data-id="<%= book.id %>">
         <a href="/books/<%= book.id %>">
           <img class="book-cover" src="/images/<%= book.image %>" alt="<%= book.title %>" />
         </a>
@@ -14,6 +14,7 @@
             <%= book.is_active ? 'В наявності' : 'Немає' %>
           </span>
           <a class="book-button" href="/books/<%= book.id %>">Детальніше</a>
+          <button class="book-delete" onclick="deleteBook(<%= book.id %>)">Видалити</button>
         </div>
       </li>
     <% }) %>

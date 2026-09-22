@@ -2,7 +2,9 @@ import { Router, Request, Response } from "express";
 import { AuthorType } from "../types/AuthorType.js";
 import { BookType } from "../types/BookType.js";
 import { pool } from "../db/db_connection.js"
+import { loggerMiddleware } from "../middlewares/logger_middleware.js"
 const authorRouter = Router();
+authorRouter.use(loggerMiddleware);
 
 //отримання всіх авторів
 authorRouter.get("/", async (req: Request, res: Response) => {

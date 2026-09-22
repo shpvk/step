@@ -24,6 +24,7 @@ app.set("layout", path.join(__dirname, "..", "views", "layouts", "main"));
 
 app.use(express.static("public"))
 app.use(express.json()) //body -> json
+app.use(express.urlencoded({extended:true}))
 app.get('/', (req:Request<null,null,null,{title:string}>,res)=>{
     
     res.render("pages/home",{
@@ -32,6 +33,7 @@ app.get('/', (req:Request<null,null,null,{title:string}>,res)=>{
     })
 })
 app.use("/books", router);
+app.use("/book", router);
 app.use("/authors", authorRouter);
 app.get('/contacts', (req,res)=>{
     res.render("pages/contacts",{

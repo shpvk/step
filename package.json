@@ -6,7 +6,8 @@
   "scripts": {
     "server": "npx tsx watch ./src/server.ts",
     "start": "npx tsx ./src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "json-server": "npx json-server ./json-server/db.json"
   },
   "keywords": [],
   "author": "",
@@ -15,8 +16,10 @@
   "devDependencies": {
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.6",
+    "@types/multer": "^2.2.0",
     "@types/node": "^26.4.1",
     "@types/pg": "^8.23.1",
+    "json-server": "^1.0.0-beta.15",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   },
@@ -25,6 +28,7 @@
     "ejs": "^6.0.1",
     "express": "^5.2.1",
     "express-ejs-layouts": "^2.5.1",
+    "multer": "^2.4.0",
     "pg": "^8.23.0"
   }
 }

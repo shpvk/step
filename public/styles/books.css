@@ -182,6 +182,22 @@ footer {
   background: var(--accent);
 }
 
+.book-delete {
+  padding: 10px 16px;
+  color: #fff;
+  background: #b91c1c;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.book-delete:hover {
+  background: #991b1b;
+}
+
 .empty {
   padding: 40px;
   text-align: center;

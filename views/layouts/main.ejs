@@ -4,13 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/styles/reset.css" rel="stylesheet" />
-    <link href="/styles/main.css" rel="stylesheet" />
+    <link href="/styles/bootstrap.min.css" rel="stylesheet" />
+    <link href="/styles/books.css" rel="stylesheet" />
+    <script src="/js/deleteBook.js" defer></script>
     <title><%=title%></title>
   </head>
   <body>
     <%- include("../partials/header") %>
     <%- include("../partials/navbar") %>
-    <main class="page">
+    <main class="container page">
       <%- body %>
     </main>
     <%- include("../partials/footer") %>
