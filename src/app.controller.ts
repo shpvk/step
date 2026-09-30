@@ -5,7 +5,6 @@ import { AppService } from './app.service.js';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  //endpoints
   @Get('/product/:id')
   getProductById(@Param('id') id: string): string {
     return `Hello from Nest! Your id: ${+id}`;

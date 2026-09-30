@@ -6,3 +6,21 @@ Content-Type: application/json
     "image" : "fruits.png",
     "parent_id" : null
 }
+
+###
+GET http://localhost:3000/book
+
+###
+POST http://localhost:3000/book
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="title"
+
+Kobzar
+--boundary
+Content-Disposition: form-data; name="image"; filename="kobzar.png"
+Content-Type: image/png
+
+< ./kobzar.png
+--boundary--
