@@ -24,3 +24,18 @@ Content-Type: image/png
 
 < ./kobzar.png
 --boundary--
+
+###
+PATCH http://localhost:3000/book/1
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="title"
+
+Kobzar 2
+--boundary
+Content-Disposition: form-data; name="image"; filename="kobzar2.png"
+Content-Type: image/png
+
+< ./kobzar2.png
+--boundary--
