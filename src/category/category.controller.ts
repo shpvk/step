@@ -1,11 +1,13 @@
 import {
   BadRequestException,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
   Body,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
   ValidationPipe,
@@ -96,6 +98,30 @@ export class CategoryController {
   @Get()
   async getAllCategory(): Promise<CategoryGetResDto[]> {
     return await this.categoryService.findAll();
+  }
+
+  @Roles('admin')
+  @Put(':id')
+  async updateCategory(
+    @Param('id') id: string,
+    @Body(new ValidationPipe({ transform: true }))
+    category: CategoryCreateReqDto,
+  ): Promise<CategoryGetResDto> {
+    const updated = await this.categoryService.update(+id, category);
+    if (!updated) {
+      throw new NotFoundException('Category not found');
+    }
+    return updated;
+  }
+
+  @Roles('admin')
+  @Delete(':id')
+  async deleteCategory(@Param('id') id: string): Promise<CategoryGetResDto> {
+    const deleted = await this.categoryService.remove(+id);
+    if (!deleted) {
+      throw new NotFoundException('Category not found');
+    }
+    return deleted;
   }
 
   // @Get(':id')

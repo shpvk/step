@@ -59,4 +59,34 @@ export class CategoryService {
       return result;
     }
   }
+
+  async update(
+    id: number,
+    dto: CategoryCreateReqDto,
+  ): Promise<CategoryGetResDto | undefined> {
+    const category = await this._repository.findOneBy({ id });
+    if (category) {
+      category.title = dto.title;
+      category.slug = dto.slug;
+      category.image = dto.image ?? category.image;
+      category.parent_id = dto.parent_id;
+      category.description = dto.description ?? category.description;
+      const result = await this._repository.save(category);
+      return {
+        id: result.id,
+        title: result.title,
+        slug: result.slug,
+        image: result.image ?? '',
+        parent_id: result.parent_id,
+      };
+    }
+  }
+
+  async remove(id: number): Promise<CategoryGetResDto | undefined> {
+    const category = await this.findById(id);
+    if (category) {
+      await this._repository.delete(id);
+    }
+    return category;
+  }
 }
