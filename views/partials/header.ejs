@@ -1,3 +1,9 @@
 <header>
   <h1>Book store</h1>
+  <p>Hello, <%= username %>!</p>
+  <% if (username === "guest") { %>
+    <a href="/login">Login</a>
+  <% } else { %>
+    <a href="/logout">Logout</a>
+  <% } %>
 </header>
