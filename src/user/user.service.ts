@@ -5,6 +5,7 @@ import { HashHelper } from '../helpers/hash.helper.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity.js';
 import { Repository } from 'typeorm';
+import { GetUserResDto } from './dto/get-user.res.dto.js';
 
 @Injectable()
 export class UserService {
@@ -64,19 +65,70 @@ export class UserService {
     return user?.role?.name === roleName;
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(): Promise<GetUserResDto[]> {
+    const users: User[] = await this._repository.find();
+    const result: GetUserResDto[] = [];
+    users.forEach((user: User) => {
+      result.push(this.toResDto(user));
+    });
+    return result;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number): Promise<GetUserResDto | null> {
+    const user: User | null = await this._repository.findOneBy({ id });
+    if (user === null) {
+      return null;
+    }
+    return this.toResDto(user);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<GetUserResDto | null> {
+    const user: User | null = await this._repository.findOneBy({ id });
+    if (user === null) {
+      return null;
+    }
+    if (
+      updateUserDto.email !== undefined &&
+      updateUserDto.email !== user.email
+    ) {
+      const existingUser: User | null = await this._repository.findOneBy({
+        email: updateUserDto.email,
+      });
+      if (existingUser !== null) {
+        throw new ConflictException('Користувач з таким email вже існує');
+      }
+      user.email = updateUserDto.email;
+    }
+    if (updateUserDto.password !== undefined) {
+      user.password_hash = await this._hashHelper.hash(updateUserDto.password);
+    }
+    if (updateUserDto.fullname !== undefined) {
+      user.fullname = updateUserDto.fullname;
+    }
+    if (updateUserDto.is_block !== undefined) {
+      user.is_block = updateUserDto.is_block;
+    }
+    const result: User = await this._repository.save(user);
+    return this.toResDto(result);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<GetUserResDto | null> {
+    const user: GetUserResDto | null = await this.findOne(id);
+    if (user !== null) {
+      await this._repository.delete(id);
+    }
+    return user;
+  }
+
+  private toResDto(user: User): GetUserResDto {
+    return {
+      id: user.id,
+      email: user.email,
+      fullname: user.fullname,
+      is_block: user.is_block,
+    };
   }
 }
