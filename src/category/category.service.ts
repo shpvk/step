@@ -4,6 +4,7 @@ import { Category } from './entities/category.entity.js';
 import { Repository } from 'typeorm';
 import { CategoryCreateReqDto } from './dtos/category_create.req.dto.js';
 import { CategoryGetResDto } from './dtos/category_get.res.dto.js';
+import { CategoryUpdateReqDto } from './dtos/category_update.req.dto.js';
 
 @Injectable()
 export class CategoryService {
@@ -71,6 +72,30 @@ export class CategoryService {
       category.image = dto.image ?? category.image;
       category.parent_id = dto.parent_id;
       category.description = dto.description ?? category.description;
+      const result = await this._repository.save(category);
+      return {
+        id: result.id,
+        title: result.title,
+        slug: result.slug,
+        image: result.image ?? '',
+        parent_id: result.parent_id,
+      };
+    }
+  }
+
+  async patch(
+    id: number,
+    dto: CategoryUpdateReqDto,
+  ): Promise<CategoryGetResDto | undefined> {
+    const category = await this._repository.findOneBy({ id });
+    if (category) {
+      category.title = dto.title ?? category.title;
+      category.slug = dto.slug ?? category.slug;
+      category.image = dto.image ?? category.image;
+      category.description = dto.description ?? category.description;
+      if (dto.parent_id !== undefined) {
+        category.parent_id = dto.parent_id;
+      }
       const result = await this._repository.save(category);
       return {
         id: result.id,

@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Param,
   Body,
+  Patch,
   Post,
   Put,
   UploadedFile,
@@ -20,6 +21,7 @@ import { join } from 'node:path';
 import { CategoryService } from './category.service.js';
 import { CategoryCreateReqDto } from './dtos/category_create.req.dto.js';
 import { CategoryGetResDto } from './dtos/category_get.res.dto.js';
+import { CategoryUpdateReqDto } from './dtos/category_update.req.dto.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 
 const categoryImageDirectory = join(process.cwd(), 'uploads', 'categories');
@@ -108,6 +110,20 @@ export class CategoryController {
     category: CategoryCreateReqDto,
   ): Promise<CategoryGetResDto> {
     const updated = await this.categoryService.update(+id, category);
+    if (!updated) {
+      throw new NotFoundException('Category not found');
+    }
+    return updated;
+  }
+
+  @Roles('admin')
+  @Patch(':id')
+  async patchCategory(
+    @Param('id') id: string,
+    @Body(new ValidationPipe({ transform: true }))
+    category: CategoryUpdateReqDto,
+  ): Promise<CategoryGetResDto> {
+    const updated = await this.categoryService.patch(+id, category);
     if (!updated) {
       throw new NotFoundException('Category not found');
     }
