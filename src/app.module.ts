@@ -6,12 +6,17 @@ import { CategoryModule } from './category/category.module.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module.js';
 import { RoleModule } from './role/role.module.js';
-import { AuthModule } from './auth/auth.module.js';
+// import { AuthModule } from './auth/auth.module.js';
 import { ProductModule } from './product/product.module.js';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    CacheModule.register({
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
@@ -24,18 +29,24 @@ import { ProductModule } from './product/product.module.js';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         autoLoadEntities: true,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        // ssl: {
+        //   rejectUnauthorized: false,
+        // },
       }),
     }),
     CategoryModule,
     UserModule,
     RoleModule,
-    AuthModule,
+    // AuthModule,
     ProductModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+  ],
 })
 export class AppModule {}
