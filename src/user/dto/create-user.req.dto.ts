@@ -1,8 +1,10 @@
 import {
   IsBoolean,
   IsEmail,
+  IsInt,
   IsOptional,
   IsString,
+  MaxLength,
   MinLength,
 } from 'class-validator';
 
@@ -26,4 +28,13 @@ export class CreateUserReqDto {
   @IsOptional()
   @IsBoolean()
   is_block?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200, { message: 'Адреса максимум 200 символів' })
+  address?: string;
+
+  @IsOptional()
+  @IsInt({ message: 'Місто має бути числом' })
+  city_id?: number;
 }

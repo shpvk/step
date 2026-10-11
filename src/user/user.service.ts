@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserReqDto } from './dto/create-user.req.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { HashHelper } from '../helpers/hash.helper.js';
@@ -6,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity.js';
 import { Repository } from 'typeorm';
 import { GetUserResDto } from './dto/get-user.res.dto.js';
+import { City } from './entities/city.entity.js';
 
 @Injectable()
 export class UserService {
@@ -13,6 +18,8 @@ export class UserService {
     @InjectRepository(User)
     private readonly _repository: Repository<User>,
     private readonly _hashHelper: HashHelper,
+    @InjectRepository(City)
+    private readonly _cityRepository: Repository<City>,
   ) {}
 
   async create(createUserDto: CreateUserReqDto) {
@@ -25,12 +32,18 @@ export class UserService {
       throw new ConflictException('Користувач з таким email вже існує');
     }
 
+    if (createUserDto.city_id !== undefined) {
+      await this.checkCity(createUserDto.city_id);
+    }
+
     const hash = await this._hashHelper.hash(createUserDto.password);
     const result = this._repository.create({
       fullname: createUserDto.fullname,
       email: createUserDto.email,
       is_block: createUserDto.is_block,
       password_hash: hash,
+      address: createUserDto.address,
+      city_id: createUserDto.city_id,
       role: { id: 2 },
     });
     const savedUser = await this._repository.save(result);
@@ -40,6 +53,8 @@ export class UserService {
       email: savedUser.email,
       fullname: savedUser.fullname,
       is_block: savedUser.is_block,
+      address: savedUser.address,
+      city_id: savedUser.city_id,
     };
   }
 
@@ -111,6 +126,13 @@ export class UserService {
     if (updateUserDto.is_block !== undefined) {
       user.is_block = updateUserDto.is_block;
     }
+    if (updateUserDto.address !== undefined) {
+      user.address = updateUserDto.address;
+    }
+    if (updateUserDto.city_id !== undefined) {
+      await this.checkCity(updateUserDto.city_id);
+      user.city_id = updateUserDto.city_id;
+    }
     const result: User = await this._repository.save(user);
     return this.toResDto(result);
   }
@@ -129,6 +151,15 @@ export class UserService {
       email: user.email,
       fullname: user.fullname,
       is_block: user.is_block,
+      address: user.address,
+      city_id: user.city_id,
     };
+  }
+
+  private async checkCity(id: number): Promise<void> {
+    const city: City | null = await this._cityRepository.findOneBy({ id });
+    if (city === null) {
+      throw new NotFoundException('Місто не знайдено');
+    }
   }
 }

@@ -3,4 +3,6 @@ export class GetUserResDto {
   email: string;
   fullname: string;
   is_block: boolean;
+  address: string | null;
+  city_id: number | null;
 }
